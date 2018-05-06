@@ -1,0 +1,25 @@
+/* your styles go here */
+
+.product .text h3 {
+    min-height: 0 !important;
+}
+
+.products-big .image {
+    min-height: 180px !important;
+}
+
+.slider-handle.round {
+    background-color: #38a7bb!important;
+    background-image: linear-gradient(to bottom,#38a7bb 0,#38a7bb 100%);
+}
+.search-box.row.bar {
+    padding: 30px 0 20px 0;
+}
+
+.search-box input, .search-box input:focus, .input-daterange input{
+    border: 1px solid #38a7bb !important;
+}
+
+.nav-pills .nav-link.selected {
+    background: #eee;
+}

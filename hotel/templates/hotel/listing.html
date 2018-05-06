@@ -1,0 +1,342 @@
+{% extends 'hotel/base.html' %}
+
+{% load static %}
+
+{% load generate_extra_data %}
+
+{% block css-content %}
+    <link rel="stylesheet" href="{% static 'hotel/vendor/bootstrap-slider/css/bootstrap-slider.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotel/vendor/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}">
+{% endblock %}
+
+{% block page-content %}
+    <div id="heading-breadcrumbs">
+        <div class="container">
+            <div class="row d-flex align-items-center flex-wrap">
+                <div class="col-md-7">
+                    <h1 class="h2">Hotel Listing</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="content">
+        <div class="container">
+            <div class="search-box row bar">
+                <div class="input-group mb-3">
+                    <input id="hotelName" name="hotel-name" type="text" class="form-control" placeholder="Hotel Name"
+                           aria-label="Recipient's username" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-template-outlined name-search" type="button"><i class="fa fa-search"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <!-- MENUS AND FILTERS-->
+                    <div class="panel panel-default sidebar-menu">
+                        <div class="panel-heading">
+                            <h3 class="h4 panel-title">Cities</h3>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="nav nav-pills flex-column text-sm category-menu">
+                                {% for city in cities %}
+                                    <li class="nav-item">
+                                        <a href="#"
+                                           class="nav-link d-flex align-items-center justify-content-between city-selection">
+                                            <span>{{ city }}</span>
+                                            <span class="badge badge-secondary">{{ cities|get_value:city }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel panel-default sidebar-menu">
+                        <div class="panel-heading d-flex align-items-center justify-content-between">
+                            <h3 class="h4 panel-title">Price</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="formControlRange">Select the price range</label>
+                                    <br/>
+                                    <input id="price-range" type="text" class="span2" value=""/>
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col">
+                                            <b id="price-low">${{ price_range.low }}</b>
+                                        </div>
+                                        <div class="col">
+                                            <b id="price-high">${{ price_range.high }}</b>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-template-outlined price-apply-btn"><i
+                                        class="fa fa-pencil"></i> Apply
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="panel panel-default sidebar-menu">
+                        <div class="panel-heading d-flex align-items-center justify-content-between">
+                            <h3 class="h4 panel-titlen">Dates</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form>
+                                <div class="input-daterange input-group" id="datepicker">
+                                    <input id="startDate" type="text" class="input-sm form-control" name="start"/>
+                                    <span class="input-group-addon">to</span>
+                                    <input id="endDate" type="text" class="input-sm form-control" name="end"/>
+                                </div>
+                                <br/>
+                                <button type="button" class="btn btn-sm btn-template-outlined date-apply-btn"><i
+                                        class="fa fa-pencil"></i> Apply
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% if request.user.is_superuser %}
+                        <div class="panel panel-default sidebar-menu">
+                            <div class="panel-heading">
+                                <h3 class="h4 panel-title">Sort</h3>
+                            </div>
+                            <div class="panel-body">
+                                <ul class="nav nav-pills flex-column text-sm category-menu">
+                                    <li class="nav-item">
+                                        <a href="#"
+                                           class="nav-link d-flex align-items-center justify-content-between sort-selection">
+                                            <span>Name</span>
+                                            <span class=""><i class="fa fa-sort"></i></span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#"
+                                           class="nav-link d-flex align-items-center justify-content-between sort-selection">
+                                            <span>Price</span>
+                                            <span class=""><i class="fa fa-sort"></i></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <input id="sortComponent" type="hidden">
+                                <input id="sortDirection" type="hidden">
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-9">
+                    <div class="row products products-big hotel-listing">
+                        {% for hotel in hotels %}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="product">
+                                    <div class="image">
+                                        <img src="{{ hotel.name|get_image_url }}" alt="" class="img-fluid image1">
+                                    </div>
+                                    <div class="text">
+                                        <h3 class="h5">
+                                            {{ hotel.name }}
+                                        </h3>
+                                        <p class="price">${{ hotel.price }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingDiv" class="modal fade hide" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body d-flex justify-content-center align-items-center">
+                    <h2>Loading...</h2>
+                    <i class="fa fa-spin fa-5x fa-spinner"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js-content %}
+    <script src="{% static 'hotel/vendor/bootstrap-slider/js/bootstrap-slider.min.js' %}"></script>
+    <script src="{% static 'hotel/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+    <script>
+        $("#price-range").slider({
+            min: {{ price_range.low }},
+            max: {{ price_range.high }},
+            value: [{{ price_range.low }}, {{ price_range.high }}],
+            focus: true
+        });
+        $(document).on('change', '#price-range', function () {
+            var value = $(this).val().split(',');
+            $("#price-low").text(value[0]);
+            $("#price-high").text(value[1]);
+        });
+        $('.input-daterange').datepicker({
+            format: 'dd/mm/yyyy',
+            startDate: '1d'
+        });
+
+        function activateModal() {
+            $("#loadingDiv").modal({
+                keyboard: false,
+                backdrop: 'static'
+            }).modal('show');
+        }
+
+        function removeModal() {
+            $("#loadingDiv").modal('hide');
+        }
+
+        $(document).on('click', '.city-selection', function (e) {
+            e.preventDefault();
+            var city_selector = $('.city-selection');
+            city_selector.removeClass('selected');
+            $(this).addClass('selected');
+            if (city_selector.hasClass('selected')) {
+                modifyListing();
+            }
+        });
+
+        $(document).on('click', '.name-search', function () {
+            if ($("#hotelName").val() !== "") {
+                modifyListing();
+            }
+        });
+
+        $(document).on('click', '.price-apply-btn', function () {
+            modifyListing();
+        });
+
+        $(document).on('click', '.date-apply-btn', function () {
+            var start_date = $("#startDate").val();
+            var end_date = $("#endDate").val();
+            if (start_date !== "" && end_date !== "") {
+                modifyListing();
+            }
+        });
+
+        $(document).on('click', '.sort-selection', function (e) {
+            e.preventDefault();
+            var sort_element = $($(this).find('span')[0]).text().toLowerCase();
+            var icon_div = $($(this).find('span')[1]).find('i');
+            var inputSortComponent = $("#sortComponent");
+            var inputSortDirection = $("#sortDirection");
+            var mainDiv = $('.sort-selection');
+            if (inputSortComponent.val() !== sort_element) {
+                $('.sort-selection i').removeClass('fa-sort-down').removeClass('fa-sort-up').addClass('fa-sort');
+                mainDiv.removeClass('selected');
+                $(this).addClass('selected');
+            }
+            inputSortComponent.val(sort_element);
+            if ($(icon_div).hasClass('fa-sort')) {
+                $(icon_div).removeClass('fa-sort').addClass('fa-sort-down');
+                inputSortDirection.val('asc');
+            } else if ($(icon_div).hasClass('fa-sort-down')) {
+                $(icon_div).removeClass('fa-sort-down').addClass('fa-sort-up');
+                inputSortDirection.val('desc');
+            } else {
+                $(icon_div).removeClass('fa-sort-up').addClass('fa-sort');
+                inputSortComponent.val("");
+                inputSortDirection.val("");
+            }
+            if (mainDiv.hasClass('selected')) {
+                modifyListing();
+            }
+        });
+
+        function modifyListingWithData(data) {
+            var hotel_div = '<div class="col-lg-4 col-md-6">\n' +
+                '<div class="product">\n' +
+                '<div class="image">\n' +
+                '<img src="HOTEL_IMAGE" alt="" class="img-fluid image1">\n' +
+                '</div>\n' +
+                '<div class="text">\n' +
+                '<h3 class="h5">\n' +
+                'HOTEL_NAME\n' +
+                '</h3>\n' +
+                '<p class="price">$PRICE</p>\n' +
+                '</div>\n' +
+                '</div>\n' +
+                '</div>';
+            var no_result_div = '<div class="align-items-center d-flex justify-content-center">No Result Found</div>';
+            var hotel_listing_div = $(".hotel-listing");
+            hotel_listing_div.html('');
+            if (data && data.length > 0) {
+                $.each(data, function (index, hotel) {
+                    var current_hotel = hotel_div.replace("HOTEL_NAME", hotel.name).replace("PRICE", hotel.price)
+                        .replace("HOTEL_IMAGE", hotel.image_url);
+                    hotel_listing_div.append(current_hotel);
+                });
+                removeModal();
+            } else {
+                hotel_listing_div.append(no_result_div);
+            }
+        }
+
+        function modifyListing() {
+{#            activateModal();#}
+            var hotel_name = $("#hotelName").val();
+            var city = $($('.city-selection.selected span')[0]).text();
+            var price_range = $("#price-range").val();
+            var start_date = $("#startDate").val();
+            var end_date = $("#endDate").val();
+            var url = 'http://127.0.0.1:8000/api/hotel';
+            var query_string_added = false;
+            if (hotel_name !== "") {
+                url += "?name=" + hotel_name;
+                query_string_added = true
+            }
+            if (city !== "") {
+                if (query_string_added) {
+                    url += "&city=" + city;
+                } else {
+                    url += "?city=" + city;
+                    query_string_added = true
+                }
+            }
+            if (price_range !== "") {
+                if (query_string_added) {
+                    url += "&price=" + price_range;
+                } else {
+                    url += "?price=" + price_range;
+                    query_string_added = true
+                }
+            }
+            if (start_date !== "" && end_date !== "") {
+                if (query_string_added) {
+                    url += "&date=" + start_date + "," + end_date;
+                } else {
+                    url += "?date=" + start_date + "," + end_date;
+                    query_string_added = true
+                }
+            }
+            {% if request.user.is_superuser %}
+                var sort_element = $("#sortComponent").val();
+                var sort_direction = $("#sortDirection").val();
+                if (sort_element !== "") {
+                    if (query_string_added) {
+                        url += "&sort=" + sort_element + "&order=" + sort_direction;
+                    } else {
+                        url += "?sort=" + sort_element + "&order=" + sort_direction;
+                    }
+                }
+            {% endif %}
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    modifyListingWithData(data);
+{#                    removeModal();#}
+                }
+            });
+        }
+    </script>
+{% endblock %}
